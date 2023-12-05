@@ -4,6 +4,7 @@ import requests
 from PIL import Image, ImageTk
 from io import BytesIO
 from search_content import *
+from double_linked_list import *
 
 
 class Screen(Frame):
@@ -97,7 +98,7 @@ movie_search_page.config(bg="#333333")
 header_label = Label(movie_search_page, text="Search For A Movie", bg='#333333', fg="#0c2b59", font=("Arial", 30))
 search_label = Label(movie_search_page, text="Enter Movie Title", bg='#333333', fg="#FFFFFF", font=("Arial", 16))
 
-search_button = Button(movie_search_page, text="Search", bg="#0c2b59", fg="#FFFFFF", font=("Arial", 16), command=lambda: search_movie_file(search_entry.get(), 1))
+search_button = Button(movie_search_page, text="Search", bg="#0c2b59", fg="#FFFFFF", font=("Arial", 16), command=lambda: display_search(search_movie_file(search_entry.get(), 1), 1))
 search_entry = Entry(movie_search_page, font=("Arial", 16))
 filter_label = Label(movie_search_page, text="Filter For A Movie", bg='#333333', fg="#0c2b59", font=("Arial", 30))
 year_label = Label(movie_search_page, text="Movie Release Year", bg='#333333', fg="#FFFFFF", font=("Arial", 16))
@@ -185,7 +186,7 @@ tv_header_label = Label(tv_search_page, text="Search For A Show", bg='#333333', 
 tv_search_label = Label(tv_search_page, text="Enter Show Title", bg='#333333', fg="#FFFFFF",
                      font=("Arial", 16))
 tv_search_entry = Entry(tv_search_page, font=("Arial", 16))
-tv_search_button = Button(tv_search_page, text="Search", bg="#0c2b59", fg="#FFFFFF", font=("Arial", 16), command=lambda: search_movie_file(tv_search_entry.get(), 2))
+tv_search_button = Button(tv_search_page, text="Search", bg="#0c2b59", fg="#FFFFFF", font=("Arial", 16), command=lambda: display_search(search_movie_file(tv_search_entry.get(), 2), 2))
 tv_filter_label = Label(tv_search_page, text="Filter For A Show", bg='#333333', fg="#0c2b59",
                      font=("Arial", 30))
 tv_year_label = Label(tv_search_page, text="Show Release Year", bg='#333333', fg="#FFFFFF", font=("Arial", 16))
@@ -382,40 +383,151 @@ add_to_watch_list = Button(movie_info_page, text="Add to\nWatchlist", font=("Ari
 add_to_watch_list.grid(row=2, column=0, sticky='nw', padx=45)
 
 
+def display_search(search_results, content_type):
+    # Search Results Window
+    search_result_page = Screen(screen_master, "Movie Search Results")
+    search_result_page.config(bg="#333333")
 
-# Search Results Window
-search_result_page = Screen(screen_master, "Movie Search Results")
-search_result_page.config(bg="#333333")
+    sr_label = Label(search_result_page, text="Your Search Results", bg='#333333', fg="#FFFFFF",
+                     font=("Arial", 36))
+    sr_label.grid(row=0, column=0, columnspan=2, pady=10, padx=300, sticky='w')
 
-sr_label = Label(search_result_page, text="Your Search Results", bg='#333333', fg="#FFFFFF",
-                  font=("Arial", 36))
-sr_label.grid(row=0, column=0, columnspan=2, pady=10, padx=300, sticky='w')
+    url = "https://m.media-amazon.com/images/M/MV5BYTU3NWI5OGMtZmZhNy00MjVmLTk1YzAtZjA3ZDA3NzcyNDUxXkEyXkFqcGdeQXVyODY5Njk4Njc@._V1_FMjpg_UX1000_.jpg"
+
+    sr_image_button1 = Button(search_result_page, text="Breaking Bad\nTV Series 2008-2013\n9.5/10 2.1M",
+                              image=None, compound=TOP, bg='#333333', borderwidth=0, fg='#FFFFFF',
+                              font=("Arial", 16), command=lambda: movie_info_page.show())
+    sr_image_button1.grid(row=1, column=0, sticky='w', padx=225)
+    img = resize_and_display_image_from_url(url, sr_image_button1)
+    sr_image_button1.config(image=img)
+
+    sr_image_button2 = Button(search_result_page, text="Breaking Bad\nTV Series 2008-2013\n9.5/10 2.1M",
+                              image=None, compound=TOP, bg='#333333', borderwidth=0, fg='#FFFFFF',
+                              font=("Arial", 16), command=lambda: movie_info_page.show())
+    sr_image_button2.grid(row=1, column=0, sticky='w', padx=600)
+    img = resize_and_display_image_from_url(url, sr_image_button2)
+    sr_image_button2.config(image=img)
+    sr_back_button = Button(search_result_page, text="Reload Last",
+                            image=None, compound=TOP, bg='#0c2b59', borderwidth=0, fg='#FFFFFF', font=("Arial", 16), command=lambda: last_button_pressed())
+    sr_next_button = Button(search_result_page, text="Load Next",
+                            image=None, compound=TOP, bg='#0c2b59', borderwidth=0, fg='#FFFFFF',
+                            font=("Arial", 16), command=lambda: next_button_pressed())
+    sr_back_button.grid(row=2, column=0, sticky='w', padx=270)
+    sr_next_button.grid(row=2, column=0, sticky='w', padx=655)
+    sr_number_of_pages_label = Label(search_result_page, text="1/2 pages", bg="#333333", fg="#FFFFFF",
+                                     font=("Arial", 16), width=86)
+    sr_number_of_pages_label.grid(row=3, column=0, sticky='w')
+
+    # Search Results Functions
+    global current_node
+    if search_results == {}:
+        if content_type == 1:
+            search_entry.delete(0, tk.END)
+            movie_search_page.show()
+            print('There Are No Matching Movies')
+        elif content_type == 2:
+            tv_search_entry.delete(0, tk.END)
+            tv_search_page.show()
+            print('There Are No Matching Tv Series')
+        return
+
+    list = DoublyLinkedList()
+    if type(search_results) is dict:
+        search_result_page.show()
+        for key, values in reversed(search_results.items()):
+            list.add(key, values)
+
+    current_node = list.head
+    next_node = list.head.next_node
+    num_of_result = len(search_results)
+    sr_number_of_pages_label.config(text=f"1/{int(num_of_result/2)} pages")
+    # Function to update the GUI based on the current node
+    def update_button1(node, x):
+        # Extract values from the dictionary in the current node
+        key = node.data[x]
+        # Create a formatted string from the values
+        if len(key[0][2]) >= 25:
+            if key[0][2][25] != "\n":
+                insert_position = 25
+                key[0][2] = key[0][2][:insert_position] + "\n" + key[0][2][insert_position:]
+
+        if len(key[0][2]) >= 50:
+            if key[0][2][50] != "\n":
+                insert_2nd_position = 50
+                key[0][2] = key[0][2][:insert_2nd_position] + "\n" + key[0][2][insert_2nd_position:]
+
+        formatted_string = f"{key[0][2]}\n{key[0][3]}\n{key[0][5]}/10 {key[0][6]}"
+
+        sr_image_button1.config(text=formatted_string)
+        url = key[0][7]
+        resize_and_display_image_from_url(url, sr_image_button1)
+
+    def update_button2(node, x):
+        # Extract values from the dictionary in the current node
+        try:
+            key = node.data[x]
+        except AttributeError:
+            sr_image_button2.grid_forget()
+            return
+
+        if len(key[0][2]) >= 25:
+            if key[0][2][25] != "\n":
+                insert_position = 25
+                key[0][2] = key[0][2][:insert_position] + "\n" + key[0][2][insert_position:]
+
+        if len(key[0][2]) >= 50:
+            if key[0][2][50] != "\n":
+                insert_2nd_position = 50
+                key[0][2] = key[0][2][:insert_2nd_position] + "\n" + key[0][2][insert_2nd_position:]
+        # Create a formatted string from the values
+        formatted_string = f"{key[0][2]}\n{key[0][3]}\n{key[0][5]}/10 {key[0][6]}"
+
+        sr_image_button2.config(text=formatted_string)
+        url = key[0][7]
+        resize_and_display_image_from_url(url, sr_image_button2)
+
+    global current_key
+    current_key = 2
+    def next_button_pressed():
+        global current_node
+        global current_key
+
+        # Check if there is a next node
+        if current_node and current_node.next_node:
+            # Set current node to the 2nd next node
+            current_node = current_node.next_node
+        if current_node and current_node.next_node:
+            current_node = current_node.next_node
+            # Update the GUI with values from the next node and the node after that
+
+            update_button1(current_node, current_key)
+            update_button2(current_node.next_node, current_key+1)
+            sr_number_of_pages_label.config(text=f"{int((current_key+2)/2)}/{int(num_of_result / 2)} pages")
+            current_key = current_key + 2
+
+    def last_button_pressed():
+        global current_node
+        global current_key
+
+        # Check if there is a next node
+        if current_node and current_node.prev_node:
+            # Set current node to the 2nd prev node
+            current_node = current_node.prev_node
+        if current_node and current_node.prev_node:
+            current_node = current_node.prev_node
+            # Update the GUI with values from the next node and the node after that
+            current_key = current_key - 4
+            update_button1(current_node, current_key)
+            update_button2(current_node.next_node, current_key+1)
+            sr_number_of_pages_label.config(text=f"{int((current_key + 2) / 2)}/{int(num_of_result / 2)} pages")
+
+            current_key = current_key + 2
 
 
-url = "https://m.media-amazon.com/images/M/MV5BYTU3NWI5OGMtZmZhNy00MjVmLTk1YzAtZjA3ZDA3NzcyNDUxXkEyXkFqcGdeQXVyODY5Njk4Njc@._V1_FMjpg_UX1000_.jpg"
+    update_button1(current_node, 0)
+    update_button2(current_node.next_node, 1)
 
-sr_image_button1 = Button(search_result_page, text="Breaking Bad\nTV Series 2008-2013\n9.5/10 2.1M",
-                           image=None, compound=TOP, bg='#333333', borderwidth=0, fg='#FFFFFF',
-                           font=("Arial", 16), command=lambda: movie_info_page.show())
-sr_image_button1.grid(row=1,column=0, sticky='w', padx=225)
-img = resize_and_display_image_from_url(url, sr_image_button1)
-sr_image_button1.config(image=img)
 
-sr_image_button2 = Button(search_result_page, text="Breaking Bad\nTV Series 2008-2013\n9.5/10 2.1M",
-                           image=None, compound=TOP, bg='#333333', borderwidth=0, fg='#FFFFFF',
-                           font=("Arial", 16), command=lambda: movie_info_page.show())
-sr_image_button2.grid(row=1, column=0, sticky='w', padx=600)
-img = resize_and_display_image_from_url(url, sr_image_button2)
-sr_image_button2.config(image=img)
-sr_back_button = Button(search_result_page, text="Reload Last",
-                         image=None, compound=TOP, bg='#0c2b59', borderwidth=0, fg='#FFFFFF', font=("Arial", 16))
-sr_next_button = Button(search_result_page, text="Load Next",
-                         image=None, compound=TOP, bg='#0c2b59', borderwidth=0, fg='#FFFFFF',
-                         font=("Arial", 16))
-sr_back_button.grid(row=2, column=0, sticky='w', padx=270)
-sr_next_button.grid(row=2, column=0, sticky='w', padx=655)
-sr_number_of_pages_label = Label(search_result_page, text="1/2 pages", bg="#333333", fg="#FFFFFF", font=("Arial", 16), width=86)
-sr_number_of_pages_label.grid(row=3, column=0, sticky='w')
 
 
 
