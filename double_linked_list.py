@@ -23,8 +23,6 @@ class Node(object):
     def set_data(self, d):
         self.data = d
 
-    def to_string(self):
-        return "Node value: " + str(self.data)
 
     def has_next(self):
         if self.get_next() is None:

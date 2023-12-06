@@ -45,7 +45,7 @@ merged_data['numVotes'] = merged_data['numVotes'].astype(float).fillna(0).astype
 merged_data['averageRating'] = merged_data['averageRating'].fillna(0)
 
 # Sort the DataFrame based on the specified criteria
-sorted_data = merged_data.sort_values(by=['averageRating', 'numVotes', 'startYear'], ascending=[False, False, False])
+sorted_data = merged_data.sort_values(by=['numVotes', 'averageRating', 'startYear'], ascending=[False, False, False])
 
 # Save the merged dataframe back to a TSV file
 sorted_data.to_csv('output_file.tsv', sep='\t', index=False)
