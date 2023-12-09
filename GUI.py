@@ -6,6 +6,7 @@ from io import BytesIO
 from search_content import *
 from double_linked_list import *
 from stack import *
+from merge_sort import *
 
 
 class Screen(Frame):
@@ -78,10 +79,12 @@ search_movies_button = Button(nav_bar, text='Search For Movies', bg="#0c2b59", f
 search_tv_button = Button(nav_bar, text='Search For TV Shows', bg="#0c2b59", fg='#FFFFFF', font=("Arial", 16),
                           command=lambda: tv_search_page.show())
 movie_watchlist_button = Button(nav_bar, text='Movie Watchlist', bg="#0c2b59", fg='#FFFFFF',
-                                font=("Arial", 16), command=lambda: movie_watchlist_page.show())
+                                font=("Arial", 16), command=lambda: (
+    update_movie_watchlist(movie_watchlist_dict), movie_watchlist_page.show()))
 tv_watchlist_button = Button(nav_bar, text='TV Show Watchlist', bg="#0c2b59", fg='#FFFFFF', font=("Arial", 16),
-                             command=lambda: tv_watchlist_page.show())
-your_ratings_button = Button(nav_bar, text='Your Ratings', bg="#0c2b59", fg='#FFFFFF', font=("Arial", 16), )
+                             command=lambda: (update_tv_watchlist(tv_watchlist_dict), tv_watchlist_page.show()))
+your_ratings_button = Button(nav_bar, text='Your Ratings', bg="#0c2b59", fg='#FFFFFF', font=("Arial", 16),
+                             command=lambda: (update_button_img(), rate_content_page.show()))
 sign_out_button = Button(nav_bar, text='Close App', bg="#0c2b59", fg='#FFFFFF', font=("Arial", 16), command=quit)
 
 # Placing toolbar widget
@@ -299,73 +302,6 @@ def resize_and_display_image_from_url(image_url, image_button):
     image_button.image = tk_img
 
 
-# Movie watchlist page
-movie_watchlist_page = Screen(screen_master, "Movie Watchlist")
-movie_watchlist_page.config(bg="#333333")
-
-watchlist_label = Label(movie_watchlist_page, text="Your Movie Watchlist", bg='#333333', fg="#FFFFFF",
-                        font=("Arial", 36))
-watchlist_label.grid(row=0, column=0, columnspan=2, pady=10, padx=300, sticky='w')
-
-url = "https://m.media-amazon.com/images/M/MV5BYTU3NWI5OGMtZmZhNy00MjVmLTk1YzAtZjA3ZDA3NzcyNDUxXkEyXkFqcGdeQXVyODY5Njk4Njc@._V1_FMjpg_UX1000_.jpg"
-
-watchlist_image_button1 = Button(movie_watchlist_page, text="Breaking Bad\nTV Series 2008-2013\n9.5/10 2.1M",
-                                 image=None, compound=TOP, bg='#333333', borderwidth=0, fg='#FFFFFF',
-                                 font=("Arial", 16), command=lambda: content_info_page.show())
-watchlist_image_button1.grid(row=1, column=0, sticky='w', padx=225)
-resize_and_display_image_from_url(url, watchlist_image_button1)
-
-
-watchlist_image_button2 = Button(movie_watchlist_page, text="Breaking Bad\nTV Series 2008-2013\n9.5/10 2.1M",
-                                 image=None, compound=TOP, bg='#333333', borderwidth=0, fg='#FFFFFF',
-                                 font=("Arial", 16), command=lambda: content_info_page.show())
-watchlist_image_button2.grid(row=1, column=0, sticky='w', padx=600)
-resize_and_display_image_from_url(url, watchlist_image_button2)
-wlist_back_button = Button(movie_watchlist_page, text="Reload Last",
-                           image=None, compound=TOP, bg='#0c2b59', borderwidth=0, fg='#FFFFFF', font=("Arial", 16))
-wlist_next_button = Button(movie_watchlist_page, text="Load Next",
-                           image=None, compound=TOP, bg='#0c2b59', borderwidth=0, fg='#FFFFFF',
-                           font=("Arial", 16))
-wlist_back_button.grid(row=2, column=0, sticky='w', padx=270)
-wlist_next_button.grid(row=2, column=0, sticky='w', padx=655)
-wlist_number_of_pages_label = Label(movie_watchlist_page, text="1/2 pages", bg="#333333", fg="#FFFFFF",
-                                    font=("Arial", 16), width=86)
-wlist_number_of_pages_label.grid(row=3, column=0, sticky='w')
-
-# Tv Watchlist Page
-tv_watchlist_page = Screen(screen_master, " Tv Watchlist")
-tv_watchlist_page.config(bg="#333333")
-watchlist_label = Label(tv_watchlist_page, text="Your Tv-Show Watchlist", bg='#333333', fg="#FFFFFF",
-                        font=("Arial", 36))
-watchlist_label.grid(row=0, column=0, columnspan=2, pady=10, padx=258, sticky='w')
-
-url = "https://m.media-amazon.com/images/M/MV5BYTU3NWI5OGMtZmZhNy00MjVmLTk1YzAtZjA3ZDA3NzcyNDUxXkEyXkFqcGdeQXVyODY5Njk4Njc@._V1_FMjpg_UX1000_.jpg"
-
-watchlist_image_button1 = Button(tv_watchlist_page, text="Breaking Bad\nTV Series 2008-2013\n9.5/10 2.1M",
-                                 image=None, compound=TOP, bg='#333333', borderwidth=0, fg='#FFFFFF',
-                                 font=("Arial", 16), command=lambda: content_info_page.show())
-watchlist_image_button1.grid(row=1, column=0, sticky='w', padx=225)
-resize_and_display_image_from_url(url, watchlist_image_button1)
-
-
-watchlist_image_button2 = Button(tv_watchlist_page, text="Breaking Bad\nTV Series 2008-2013\n9.5/10 2.1M",
-                                 image=None, compound=TOP, bg='#333333', borderwidth=0, fg='#FFFFFF',
-                                 font=("Arial", 16), command=lambda: content_info_page.show())
-watchlist_image_button2.grid(row=1, column=0, sticky='w', padx=600)
-resize_and_display_image_from_url(url, watchlist_image_button2)
-wlist_back_button = Button(tv_watchlist_page, text="Reload Last",
-                           image=None, compound=TOP, bg='#0c2b59', borderwidth=0, fg='#FFFFFF',
-                           font=("Arial", 16))
-wlist_next_button = Button(tv_watchlist_page, text="Load Next",
-                           image=None, compound=TOP, bg='#0c2b59', borderwidth=0, fg='#FFFFFF',
-                           font=("Arial", 16))
-wlist_back_button.grid(row=2, column=0, sticky='w', padx=270)
-wlist_next_button.grid(row=2, column=0, sticky='w', padx=655)
-wlist_number_of_pages_label = Label(tv_watchlist_page, text="1/2 pages", bg="#333333", fg="#FFFFFF",
-                                    font=("Arial", 16), width=86)
-wlist_number_of_pages_label.grid(row=3, column=0, sticky='w')
-
-
 def display_search(search_results, content_type):
     # Search Results Window
     search_result_page = Screen(screen_master, "Movie Search Results")
@@ -428,17 +364,17 @@ def display_search(search_results, content_type):
         # Extract values from the dictionary in the current node
         key = node.data[x]
         # Create a formatted string from the values
-        if len(key[0][2]) > 25:
-            if key[0][2][25] != "\n":
-                insert_position = 25
+        if len(key[0][2]) > 20:
+            if key[0][2][20] != "\n":
+                insert_position = 20
                 key[0][2] = key[0][2][:insert_position] + "\n" + key[0][2][insert_position:]
 
-        if len(key[0][2]) > 50:
-            if key[0][2][50] != "\n":
-                insert_2nd_position = 50
+        if len(key[0][2]) > 40:
+            if key[0][2][40] != "\n":
+                insert_2nd_position = 40
                 key[0][2] = key[0][2][:insert_2nd_position] + "\n" + key[0][2][insert_2nd_position:]
 
-        formatted_string = f"{key[0][2]}\n{key[0][3]}\nRating: {key[0][5]}/10\n{key[0][6]} Votes"
+        formatted_string = f"{key[0][2]}\nYear: {key[0][3]}\nRating: {key[0][5]}/10\nVotes: {key[0][6]}"
 
         sr_image_button1.config(text=formatted_string)
         url = key[0][7]
@@ -453,17 +389,17 @@ def display_search(search_results, content_type):
             sr_image_button2.grid_forget()
             return
 
-        if len(key[0][2]) > 25:
-            if key[0][2][25] != "\n":
-                insert_position = 25
+        if len(key[0][2]) > 20:
+            if key[0][2][20] != "\n":
+                insert_position = 20
                 key[0][2] = key[0][2][:insert_position] + "\n" + key[0][2][insert_position:]
 
-        if len(key[0][2]) > 50:
-            if key[0][2][50] != "\n":
-                insert_2nd_position = 50
+        if len(key[0][2]) > 40:
+            if key[0][2][40] != "\n":
+                insert_2nd_position = 40
                 key[0][2] = key[0][2][:insert_2nd_position] + "\n" + key[0][2][insert_2nd_position:]
         # Create a formatted string from the values
-        formatted_string = f"{key[0][2]}\n{key[0][3]}\nRating: {key[0][5]}/10\n{key[0][6]} Votes"
+        formatted_string = f"{key[0][2]}\nYear: {key[0][3]}\nRating: {key[0][5]}/10\nVotes: {key[0][6]}"
 
         sr_image_button2.config(text=formatted_string)
         url = key[0][7]
@@ -518,7 +454,7 @@ def display_search(search_results, content_type):
 
 def update_content_info(node, x):
     # Content Info Page
-    content_info_page = Screen(screen_master, "Movie Details")
+    content_info_page = Screen(screen_master, "Content Details")
     content_info_page.config(bg="#333333")
     url = "https://m.media-amazon.com/images/M/MV5BYTU3NWI5OGMtZmZhNy00MjVmLTk1YzAtZjA3ZDA3NzcyNDUxXkEyXkFqcGdeQXVyODY5Njk4Njc@._V1_FMjpg_UX1000_.jpg"
     content_details_img = Button(content_info_page, text="TV Series 2008-2013\n9.5/10 2.1M", compound=TOP, img=None,
@@ -529,7 +465,7 @@ def update_content_info(node, x):
     content_title.grid(row=1, column=0, padx=225, pady=5, sticky="nw")
     description_title = Label(content_info_page,
                               text="A chemistry teacher diagnosed with inoperable lung cancer turns to manufacturing\nand selling methamphetamine with a former student in order to secure his family's\nfuture",
-                              bg='#333333', fg="#FFFFFF", font=("Arial", 16), borderwidth=0, pady=10)
+                              bg='#333333', fg="#FFFFFF", font=("Arial", 16), borderwidth=0, pady=10, justify='left')
     description_title.grid(row=1, column=0, padx=225, pady=80, sticky="nw")
     content_genre_tag1 = Button(content_info_page, text="Documentary", font=("Arial", 14), bg='#0c2b59', fg='#FFFFFF',
                                 width=11, height=1)
@@ -547,16 +483,35 @@ def update_content_info(node, x):
                              width=11, command=lambda: add_to_watched_stack(node, x))
     mark_as_watched.grid(row=3, column=0, sticky='nw', padx=45)
 
-    # Pages Button Functions
-    def add_to_watchlist(node, x):
+    if node.data[x][0][0] in watched_dict:
+        mark_as_watched.config(text="Marked As\nWatched")
+
+    if node.data[x][0][0] in movie_watchlist_dict:
         add_watchlist.config(text="Added to\nWatchlist")
 
+    if node.data[x][0][0] in tv_watchlist_dict:
+        add_watchlist.config(text="Added to\nWatchlist")
+
+    # Pages Button Functions
+    def add_to_watchlist(node, x):
+        if add_watchlist.cget("text") == "Add to\nWatchlist":
+            add_watchlist.config(text="Added to\nWatchlist")
+            info = node.data[x]
+            if info[0][1] == "movie":
+                movie_watchlist_dict[info[0][0]] = info[0]
+            elif info[0][1] == "tvSeries":
+                tv_watchlist_dict[info[0][0]] = info[0]
+
     def add_to_watched_stack(node, x):
-        mark_as_watched.config(text="Marked As\nWatched")
+        if mark_as_watched.cget("text") == "Mark As\nWatched":
+            info = node.data[x]
+            watched_stack.push(info[0])
+            watched_dict[info[0][0]] = info[0]
+            mark_as_watched.config(text="Marked As\nWatched")
 
     key = node.data[x]
 
-    content_data = f"{key[0][3]}\nRating: {key[0][5]}/10\n{key[0][6]} Votes"
+    content_data = f"Year: {key[0][3]}\nRating: {key[0][5]}/10\nVotes: {key[0][6]}"
     content_details_img.config(text=content_data)
     url = key[0][7]
     resize_and_display_image_from_url(url, content_details_img)
@@ -624,8 +579,539 @@ def update_content_info(node, x):
 
 
 #  Rate Content Page
-rate_content_page = Screen(screen_master, "Movie Watchlist")
-rate_content
+global watched_stack
+global watched_dict
+watched_stack = Stack()
+watched_dict = {}
+rate_content_page = Screen(screen_master, "Content Ratings")
+rate_content_page.config(bg="#333333")
+rate_content = Button(rate_content_page, text="Mark Something As\nWatched To Rate It", compound=TOP, img=None,
+                      borderwidth=0, bg='#333333', fg='#FFFFFF', font=("Arial", 16))
+rate_content.grid(row=0, column=0, sticky='nw')
+rating_entry = Entry(rate_content_page, font=("Arial", 21), justify='center', width=4, )
+rating_entry.grid(row=1, column=0, sticky='e', padx=0)
+enter_rating = Button(rate_content_page, text='Enter Rating', bg="#0c2b59", fg='#FFFFFF', font=("Arial", 16),
+                      command=lambda: enter_rating())
+enter_rating.grid(row=1, column=0, sticky='w', padx=10)
+skip_button = Button(rate_content_page, text='Skip', width=10, bg="#0c2b59", fg='#FFFFFF', font=("Arial", 16),
+                     command=lambda: skip_button())
+skip_button.grid(row=2, column=0, pady=5, stick="w", padx=11)
+movie_rating_label = Label(rate_content_page, text="Top Movie Ratings:", bg='#333333', fg="#FFFFFF",
+                           font=("Arial", 21))
+movie_rating_label.grid(row=0, column=1, padx=35, sticky='nw', pady=10)
+
+tv_rating_label = Label(rate_content_page, text="Top Tv Show Ratings:", bg='#333333', fg="#FFFFFF",
+                        font=("Arial", 21))
+tv_rating_label.grid(row=0, column=1, padx=425, sticky='ne', pady=10)
+top_movie_rating_button = Button(rate_content_page, text='Display', bg="#0c2b59", fg='#FFFFFF', font=("Arial", 16))
+top_movie_rating_button.grid(row=0, column=1, sticky='nw', pady=10, padx=290)
+top_tv_rating_button = Button(rate_content_page, text='Display', bg="#0c2b59", fg='#FFFFFF', font=("Arial", 16))
+top_tv_rating_button.grid(row=0, column=1, sticky='ne', pady=10, padx=330)
+
+
+def update_button_img():
+    if not watched_stack.is_empty():
+        top = watched_stack.peek()
+        url = top[7]
+        resize_and_display_image_from_url(url, rate_content)
+        rate_content.config(text=f'{top[3]}\n{top[5]}/10: {top[6]}')
+
+
+def skip_button():
+    if not watched_stack.is_empty():
+        watched_stack.pop()
+        if not watched_stack.is_empty():
+            top = watched_stack.peek()
+            url = top[7]
+            resize_and_display_image_from_url(url, rate_content)
+            rate_content.config(text=f'{top[3]}\n{top[5]}/10: {top[6]}')
+        else:
+            rate_content.config(image='')
+            rate_content.config(text='Mark Something As\nWatched To Rate It')
+    else:
+        rate_content.config(image='')
+        rate_content.config(text='Mark Something As\nWatched To Rate It')
+
+
+def enter_rating():
+    try:
+        # Attempt to convert the value to a float
+        float_value = float(rating_entry.get())
+
+        # Check if the float is within the specified range
+        if 1.0 <= float_value <= 10.0 and float_value == round(float_value, 1):
+            top = watched_stack.peek()
+            watched_dict[top[0]].append(float_value)
+            rating_entry.config(text='')
+            if not watched_stack.is_empty():
+                watched_stack.pop()
+                if not watched_stack.is_empty():
+                    top = watched_stack.peek()
+                    url = top[7]
+                    resize_and_display_image_from_url(url, rate_content)
+                    rate_content.config(text=f'{top[3]}\n{top[5]}/10: {top[6]}')
+                    rating_entry.delete(0, tk.END)
+                else:
+                    rate_content.config(image='')
+                    rate_content.config(text='Mark Something As\nWatched To Rate It')
+                    rating_entry.delete(0, tk.END)
+            else:
+                rate_content.config(image='')
+                rate_content.config(text='Mark Something As\nWatched To Rate It')
+                rating_entry.delete(0, tk.END)
+        else:
+            rating_entry.delete(0, tk.END)
+            print('Please enter a value between 1.0 and 10')
+
+    except ValueError:
+        # ValueError will be raised if the conversion to float fails
+        print('Please enter a number')
+        rating_entry.delete(0, tk.END)
+
+
+# Movie watchlist page
+global movie_watchlist_dict
+movie_watchlist_dict = {}
+global movie_watchlist_image_button1
+global movie_watchlist_image_button2
+global movie_wlist_back_button
+global movie_wlist_next_button
+global movie_wlist_number_of_pages_label
+global movie_dict_index
+movie_dict_index = 0
+movie_watchlist_page = Screen(screen_master, "Movie Watchlist")
+movie_watchlist_page.config(bg="#333333")
+movie_watchlist_label = Label(movie_watchlist_page, text="Your Movie Watchlist", bg='#333333', fg="#FFFFFF",
+                              font=("Arial", 36))
+movie_watchlist_label.grid(row=0, column=0, columnspan=2, pady=10, padx=300, sticky='w')
+movie_watchlist_image_button1 = Button(movie_watchlist_page, compound=TOP, bg='#333333', borderwidth=0, fg='#FFFFFF',
+                                       font=("Arial", 16))
+movie_watchlist_image_button1.grid(row=1, column=0, sticky='w', padx=225)
+movie_watchlist_image_button2 = Button(movie_watchlist_page, compound=TOP, bg='#333333', borderwidth=0, fg='#FFFFFF',
+                                       font=("Arial", 16))
+movie_watchlist_image_button2.grid(row=1, column=0, sticky='w', padx=600)
+movie_wlist_number_of_pages_label = Label(movie_watchlist_page, text="1/2 pages", bg="#333333", fg="#FFFFFF",
+                                          font=("Arial", 16), width=86)
+movie_wlist_number_of_pages_label.grid(row=3, column=0, sticky='w')
+
+movie_wlist_sorting = Button(movie_watchlist_page, text="Sorting Options", borderwidth=0, bg="#0c2b59", fg="#FFFFFF",
+                             font=("Arial", 20), command=lambda: merge_sort_dict(0))
+movie_wlist_sorting.grid(row=0, column=0, sticky="nw", pady=20, padx=20)
+
+
+def update_movie_watchlist(dict):
+    movie_wlist_back_button = Button(movie_watchlist_page, text="Reload Last",
+                                     image=None, compound=TOP, bg='#0c2b59', borderwidth=0, fg='#FFFFFF',
+                                     font=("Arial", 16), command=lambda: last_button())
+    movie_wlist_next_button = Button(movie_watchlist_page, text="Load Next",
+                                     image=None, compound=TOP, bg='#0c2b59', borderwidth=0, fg='#FFFFFF',
+                                     font=("Arial", 16), command=lambda: next_button())
+    movie_wlist_back_button.grid(row=2, column=0, sticky='w', padx=270)
+    movie_wlist_next_button.grid(row=2, column=0, sticky='w', padx=655)
+
+    # Function to update the GUI
+    def update_button1(key):
+        data = dict[key]
+        if len(data[2]) > 20:
+            if data[2][20] != "\n":
+                insert_position = 20
+                data[2] = data[2][:insert_position] + "\n" + data[2][insert_position:]
+
+        if len(data[2]) > 40:
+            if data[2][40] != "\n":
+                insert_2nd_position = 40
+                data[2] = data[2][:insert_2nd_position] + "\n" + data[2][insert_2nd_position:]
+        movie_watchlist_image_button1.config(text=f'{data[2]}\nYear: {data[3]}\nRating: {data[5]}/10\nVotes: {data[6]}')
+        resize_and_display_image_from_url(data[7], movie_watchlist_image_button1)
+        movie_watchlist_image_button1.grid(row=1, column=0, sticky='w', padx=225)
+
+    def update_button2(key):
+        data = dict[key]
+        if len(data[2]) > 20:
+            if data[2][20] != "\n":
+                insert_position = 20
+                data[2] = data[2][:insert_position] + "\n" + data[2][insert_position:]
+
+        if len(data[2]) > 40:
+            if data[2][40] != "\n":
+                insert_2nd_position = 40
+                data[2] = data[2][:insert_2nd_position] + "\n" + data[2][insert_2nd_position:]
+        movie_watchlist_image_button2.config(text=f'{data[2]}\nYear: {data[3]}\nRating: {data[5]}/10\nVotes: {data[6]}')
+        resize_and_display_image_from_url(data[7], movie_watchlist_image_button2)
+        movie_watchlist_image_button2.grid(row=1, column=0, sticky='w', padx=600)
+
+    def if_odd_add1(num):
+        if num % 2 != 0:
+            num = num + 1
+        return num
+
+    if int(len(dict.keys())) == 0:
+        movie_watchlist_image_button1.grid_forget()
+        movie_watchlist_image_button2.grid_forget()
+        movie_wlist_next_button.grid_forget()
+        movie_wlist_back_button.grid_forget()
+        movie_wlist_number_of_pages_label.grid_forget()
+    elif int(len(dict.keys())) == 1:
+        movie_watchlist_image_button2.grid_forget()
+        keys_list = list(dict.keys())
+        update_button1(keys_list[0])
+        movie_wlist_number_of_pages_label.config(text="1/1 Pages")
+        movie_wlist_number_of_pages_label.grid(row=3, column=0, sticky='w')
+        movie_wlist_back_button.grid(row=2, column=0, sticky='w', padx=270)
+        movie_wlist_next_button.grid(row=2, column=0, sticky='w', padx=655)
+    elif int(len(dict.keys())) == 2:
+        keys_list = list(dict.keys())
+        update_button1(keys_list[0])
+        update_button2(keys_list[1])
+        movie_wlist_number_of_pages_label.config(text="1/1 Pages")
+        movie_wlist_number_of_pages_label.grid(row=3, column=0, sticky='w')
+        movie_wlist_back_button.grid(row=2, column=0, sticky='w', padx=270)
+        movie_wlist_next_button.grid(row=2, column=0, sticky='w', padx=655)
+    else:
+        keys_list = list(dict.keys())
+        update_button1(keys_list[movie_dict_index])
+        if len(keys_list) - movie_dict_index >= 2:
+            update_button2(keys_list[movie_dict_index + 1])
+        num = len(keys_list)
+        number_of_pages = int(if_odd_add1(num) / 2)
+        movie_wlist_number_of_pages_label.config(text=f"{(movie_dict_index + 2) // 2}/{number_of_pages} Pages")
+        movie_wlist_number_of_pages_label.grid(row=3, column=0, sticky='w')
+        movie_wlist_back_button.grid(row=2, column=0, sticky='w', padx=270)
+        movie_wlist_next_button.grid(row=2, column=0, sticky='w', padx=655)
+
+    def next_button():
+        global movie_dict_index
+        if len(list(dict.keys())) - movie_dict_index > 2:
+            keys_list = list(dict.keys())
+            num = len(keys_list)
+            movie_dict_index += 2
+            movie_wlist_number_of_pages_label.config(
+                text=f"{((movie_dict_index + 2) // 2)}/{if_odd_add1(num) // 2} Pages")
+
+            if num - movie_dict_index >= 2:
+                update_button1(keys_list[movie_dict_index])
+                update_button2(keys_list[movie_dict_index + 1])
+                movie_watchlist_image_button2.grid(row=1, column=0, sticky='w', padx=600)
+            else:
+                update_button1(keys_list[movie_dict_index])
+                movie_watchlist_image_button2.grid_forget()
+
+    def last_button():
+        global movie_dict_index
+        if movie_dict_index != 0:
+            keys_list = list(dict.keys())
+            num = len(keys_list)
+            movie_dict_index -= 2
+            movie_wlist_number_of_pages_label.config(
+                text=f"{((movie_dict_index + 2) // 2)}/{if_odd_add1(num) // 2} Pages")
+
+            if num - movie_dict_index >= 2:
+                update_button1(keys_list[movie_dict_index])
+                update_button2(keys_list[movie_dict_index + 1])
+                movie_watchlist_image_button2.grid(row=1, column=0, sticky='w', padx=600)
+            else:
+                update_button1(keys_list[movie_dict_index])
+                movie_watchlist_image_button2.grid_forget()
+
+
+# Tv Watchlist Page
+global tv_watchlist_dict
+tv_watchlist_dict = {}
+global tv_watchlist_image_button1
+global tv_watchlist_image_button2
+global tv_wlist_back_button
+global tv_wlist_next_button
+global tv_wlist_number_of_pages_label
+global tv_dict_index
+tv_dict_index = 0
+tv_watchlist_page = Screen(screen_master, " Tv Watchlist")
+tv_watchlist_page.config(bg="#333333")
+watchlist_label = Label(tv_watchlist_page, text="Your Tv-Show Watchlist", bg='#333333', fg="#FFFFFF",
+                        font=("Arial", 36))
+watchlist_label.grid(row=0, column=0, columnspan=2, pady=10, padx=258, sticky='w')
+tv_watchlist_image_button1 = Button(tv_watchlist_page, compound=TOP, bg='#333333', borderwidth=0, fg='#FFFFFF',
+                                    font=("Arial", 16))
+tv_watchlist_image_button1.grid(row=1, column=0, sticky='w', padx=225)
+tv_watchlist_image_button2 = Button(tv_watchlist_page, compound=TOP, bg='#333333', borderwidth=0, fg='#FFFFFF',
+                                    font=("Arial", 16))
+tv_watchlist_image_button2.grid(row=1, column=0, sticky='w', padx=600)
+tv_wlist_number_of_pages_label = Label(tv_watchlist_page, text="1/2 pages", bg="#333333", fg="#FFFFFF",
+                                       font=("Arial", 16), width=86)
+tv_wlist_number_of_pages_label.grid(row=3, column=0, sticky='w')
+tv_wlist_sorting = Button(tv_watchlist_page, text="Sorting Options", borderwidth=0, bg="#0c2b59", fg="#FFFFFF",
+                          font=("Arial", 20), command=lambda: merge_sort_dict(1))
+tv_wlist_sorting.grid(row=0, column=0, sticky="nw", pady=20, padx=20)
+
+
+def update_tv_watchlist(dict):
+    tv_wlist_back_button = Button(tv_watchlist_page, text="Reload Last",
+                                  image=None, compound=TOP, bg='#0c2b59', borderwidth=0, fg='#FFFFFF',
+                                  font=("Arial", 16), command=lambda: last_button())
+    tv_wlist_next_button = Button(tv_watchlist_page, text="Load Next",
+                                  image=None, compound=TOP, bg='#0c2b59', borderwidth=0, fg='#FFFFFF',
+                                  font=("Arial", 16), command=lambda: next_button())
+    tv_wlist_back_button.grid(row=2, column=0, sticky='w', padx=270)
+    tv_wlist_next_button.grid(row=2, column=0, sticky='w', padx=655)
+
+    def update_button1(key):
+        data = dict[key]
+        if len(data[2]) > 20:
+            if data[2][20] != "\n":
+                insert_position = 20
+                data[2] = data[2][:insert_position] + "\n" + data[2][insert_position:]
+
+        if len(data[2]) > 40:
+            if data[2][40] != "\n":
+                insert_2nd_position = 40
+                data[2] = data[2][:insert_2nd_position] + "\n" + data[2][insert_2nd_position:]
+        tv_watchlist_image_button1.config(text=f'{data[2]}\nYear: {data[3]}\nRating: {data[5]}/10\nVotes: {data[6]}')
+        resize_and_display_image_from_url(data[7], tv_watchlist_image_button1)
+        tv_watchlist_image_button1.grid(row=1, column=0, sticky='w', padx=225)
+
+    def update_button2(key):
+        data = dict[key]
+        if len(data[2]) > 20:
+            if data[2][20] != "\n":
+                insert_position = 20
+                data[2] = data[2][:insert_position] + "\n" + data[2][insert_position:]
+
+        if len(data[2]) > 40:
+            if data[2][40] != "\n":
+                insert_2nd_position = 40
+                data[2] = data[2][:insert_2nd_position] + "\n" + data[2][insert_2nd_position:]
+        tv_watchlist_image_button2.config(text=f'{data[2]}\nYear: {data[3]}\nRating: {data[5]}/10\nVotes: {data[6]}')
+        resize_and_display_image_from_url(data[7], tv_watchlist_image_button2)
+        tv_watchlist_image_button2.grid(row=1, column=0, sticky='w', padx=600)
+
+    def if_odd_add1(num):
+        if num % 2 != 0:
+            num = num + 1
+        return num
+
+    if int(len(dict.keys())) == 0:
+        tv_watchlist_image_button1.grid_forget()
+        tv_watchlist_image_button2.grid_forget()
+        tv_wlist_next_button.grid_forget()
+        tv_wlist_back_button.grid_forget()
+        tv_wlist_number_of_pages_label.grid_forget()
+    elif int(len(dict.keys())) == 1:
+        tv_watchlist_image_button2.grid_forget()
+        keys_list = list(dict.keys())
+        update_button1(keys_list[0])
+        tv_wlist_number_of_pages_label.config(text="1/1 Pages")
+        tv_wlist_number_of_pages_label.grid(row=3, column=0, sticky='w')
+        tv_wlist_back_button.grid(row=2, column=0, sticky='w', padx=270)
+        tv_wlist_next_button.grid(row=2, column=0, sticky='w', padx=655)
+    elif int(len(dict.keys())) == 2:
+        keys_list = list(dict.keys())
+        update_button1(keys_list[0])
+        update_button2(keys_list[1])
+        tv_wlist_number_of_pages_label.config(text="1/1 Pages")
+        tv_wlist_number_of_pages_label.grid(row=3, column=0, sticky='w')
+        tv_wlist_back_button.grid(row=2, column=0, sticky='w', padx=270)
+        tv_wlist_next_button.grid(row=2, column=0, sticky='w', padx=655)
+    else:
+        keys_list = list(dict.keys())
+        update_button1(keys_list[tv_dict_index])
+        if len(keys_list) - tv_dict_index >= 2:
+            update_button2(keys_list[tv_dict_index + 1])
+        num = len(keys_list)
+        number_of_pages = int(if_odd_add1(num) / 2)
+        tv_wlist_number_of_pages_label.config(text=f"{(tv_dict_index + 2) // 2}/{number_of_pages} Pages")
+        tv_wlist_number_of_pages_label.grid(row=3, column=0, sticky='w')
+        tv_wlist_back_button.grid(row=2, column=0, sticky='w', padx=270)
+        tv_wlist_next_button.grid(row=2, column=0, sticky='w', padx=655)
+
+    def next_button():
+        global tv_dict_index
+        if len(list(dict.keys())) - tv_dict_index > 2:
+            keys_list = list(dict.keys())
+            num = len(keys_list)
+            tv_dict_index += 2
+            tv_wlist_number_of_pages_label.config(
+                text=f"{((tv_dict_index + 2) // 2)}/{if_odd_add1(num) // 2} Pages")
+
+            if num - tv_dict_index >= 2:
+                update_button1(keys_list[tv_dict_index])
+                update_button2(keys_list[tv_dict_index + 1])
+                tv_watchlist_image_button2.grid(row=1, column=0, sticky='w', padx=600)
+            else:
+                update_button1(keys_list[tv_dict_index])
+                tv_watchlist_image_button2.grid_forget()
+
+    def last_button():
+        global tv_dict_index
+        if tv_dict_index != 0:
+            keys_list = list(dict.keys())
+            num = len(keys_list)
+            tv_dict_index -= 2
+            tv_wlist_number_of_pages_label.config(
+                text=f"{((tv_dict_index + 2) // 2)}/{if_odd_add1(num) // 2} Pages")
+
+            if num - tv_dict_index >= 2:
+                update_button1(keys_list[tv_dict_index])
+                update_button2(keys_list[tv_dict_index + 1])
+                tv_watchlist_image_button2.grid(row=1, column=0, sticky='w', padx=600)
+            else:
+                update_button1(keys_list[tv_dict_index])
+                tv_watchlist_image_button2.grid_forget()
+
+
+# Sorting Options Page
+def merge_sort_dict(identifer):
+    sorting_options_page = Screen(screen_master, "Sorting Options")
+    sorting_options_page.config(bg="#333333")
+    ascending_label = Label(sorting_options_page, text="Sort One Of The Below Values\nFrom Highest To Lowest",
+                            fg='#FFFFFF',
+                            font=("Arial", 28), bg='#333333')
+    descending_label = Label(sorting_options_page, text="Sort One Of The Below Values\nFrom Lowest To Highest",
+                             fg='#FFFFFF',
+                             font=("Arial", 28), bg='#333333')
+    year_ascend_cb = Checkbutton(sorting_options_page, text="Release Year", fg='#FFFFFF',
+                                 font=("Arial", 20), bg='#333333', command=lambda: highlight_checkbox(1))
+    rating_ascend_cb = Checkbutton(sorting_options_page, text="Rating", fg='#FFFFFF',
+                                   font=("Arial", 20), bg='#333333', command=lambda: highlight_checkbox(2))
+    votes_ascend_cb = Checkbutton(sorting_options_page, text="Number Of Votes", fg='#FFFFFF',
+                                  font=("Arial", 20), bg='#333333', command=lambda: highlight_checkbox(3))
+    year_descend_cb = Checkbutton(sorting_options_page, text="Release Year", fg='#FFFFFF',
+                                  font=("Arial", 20), bg='#333333', command=lambda: highlight_checkbox(4))
+    rating_descend_cb = Checkbutton(sorting_options_page, text="Rating", fg='#FFFFFF',
+                                    font=("Arial", 20), bg='#333333', command=lambda: highlight_checkbox(5))
+    votes_descend_cb = Checkbutton(sorting_options_page, text="Number Of Votes", fg='#FFFFFF',
+                                   font=("Arial", 20), bg='#333333', command=lambda: highlight_checkbox(6))
+    confirm_button = Button(sorting_options_page, text="Confirm", fg='#FFFFFF',
+                            font=("Arial", 20), bg="#0c2b59", command=lambda: confirm_button(identifer))
+    cancel_button = Button(sorting_options_page, text="Cancel", fg='#FFFFFF',
+                           font=("Arial", 20), bg="#0c2b59", command=lambda: cancel_button(identifer))
+    ascending_label.grid(row=0, column=0, sticky='w')
+    descending_label.grid(row=0, column=1, sticky='w', padx=20)
+    year_ascend_cb.grid(row=1, column=0)
+    rating_ascend_cb.grid(row=2, column=0)
+    votes_ascend_cb.grid(row=3, column=0)
+    year_descend_cb.grid(row=1, column=1)
+    rating_descend_cb.grid(row=2, column=1)
+    votes_descend_cb.grid(row=3, column=1)
+    confirm_button.grid(row=4, column=1, sticky='w', pady=100, padx=75)
+    cancel_button.grid(row=4, column=0, sticky='e', pady=100, padx=75)
+
+    def highlight_checkbox(box):
+        if box == 1:
+            year_ascend_cb.config(bg='#0c2b59')
+            rating_ascend_cb.config(bg='#333333')
+            votes_ascend_cb.config(bg='#333333')
+            year_descend_cb.config(bg='#333333')
+            rating_descend_cb.config(bg='#333333')
+            votes_descend_cb.config(bg='#333333')
+        elif box == 2:
+            year_ascend_cb.config(bg='#333333')
+            rating_ascend_cb.config(bg='#0c2b59')
+            votes_ascend_cb.config(bg='#333333')
+            year_descend_cb.config(bg='#333333')
+            rating_descend_cb.config(bg='#333333')
+            votes_descend_cb.config(bg='#333333')
+        elif box == 3:
+            year_ascend_cb.config(bg='#333333')
+            rating_ascend_cb.config(bg='#333333')
+            votes_ascend_cb.config(bg='#0c2b59')
+            year_descend_cb.config(bg='#333333')
+            rating_descend_cb.config(bg='#333333')
+            votes_descend_cb.config(bg='#333333')
+        elif box == 4:
+            year_ascend_cb.config(bg='#333333')
+            rating_ascend_cb.config(bg='#333333')
+            votes_ascend_cb.config(bg='#333333')
+            year_descend_cb.config(bg='#0c2b59')
+            rating_descend_cb.config(bg='#333333')
+            votes_descend_cb.config(bg='#333333')
+        elif box == 5:
+            year_ascend_cb.config(bg='#333333')
+            rating_ascend_cb.config(bg='#333333')
+            votes_ascend_cb.config(bg='#333333')
+            year_descend_cb.config(bg='#333333')
+            rating_descend_cb.config(bg='#0c2b59')
+            votes_descend_cb.config(bg='#333333')
+        elif box == 6:
+            year_ascend_cb.config(bg='#333333')
+            rating_ascend_cb.config(bg='#333333')
+            votes_ascend_cb.config(bg='#333333')
+            year_descend_cb.config(bg='#333333')
+            rating_descend_cb.config(bg='#333333')
+            votes_descend_cb.config(bg='#0c2b59')
+
+    def cancel_button(identifer):
+        if identifer == 0:
+            movie_watchlist_page.show()
+        elif identifer == 1:
+            tv_watchlist_page.show()
+
+    def confirm_button(identifer):
+        if year_ascend_cb.cget("background") == '#0c2b59':
+            if identifer == 0:
+                mergesort_dict = MergeSortDict(movie_watchlist_dict)
+                sorted_dict = mergesort_dict.merge_sort(by_key=False, ascending=False, value_index=3)
+                update_movie_watchlist(sorted_dict)
+                movie_watchlist_page.show()
+            elif identifer == 1:
+                mergesort_dict = MergeSortDict(tv_watchlist_dict)
+                sorted_dict = mergesort_dict.merge_sort(by_key=False, ascending=False, value_index=3)
+                update_tv_watchlist(sorted_dict)
+                tv_watchlist_page.show()
+        if rating_ascend_cb.cget("background") == '#0c2b59':
+            if identifer == 0:
+                mergesort_dict = MergeSortDict(movie_watchlist_dict)
+                sorted_dict = mergesort_dict.merge_sort(by_key=False, ascending=False, value_index=5)
+                update_movie_watchlist(sorted_dict)
+                movie_watchlist_page.show()
+            elif identifer == 1:
+                mergesort_dict = MergeSortDict(tv_watchlist_dict)
+                sorted_dict = mergesort_dict.merge_sort(by_key=False, ascending=False, value_index=5)
+                update_tv_watchlist(sorted_dict)
+                tv_watchlist_page.show()
+        if votes_ascend_cb.cget("background") == '#0c2b59':
+            if identifer == 0:
+                mergesort_dict = MergeSortDict(movie_watchlist_dict)
+                sorted_dict = mergesort_dict.merge_sort(by_key=False, ascending=False, value_index=6)
+                update_movie_watchlist(sorted_dict)
+                movie_watchlist_page.show()
+            elif identifer == 1:
+                mergesort_dict = MergeSortDict(tv_watchlist_dict)
+                sorted_dict = mergesort_dict.merge_sort(by_key=False, ascending=False, value_index=6)
+                update_tv_watchlist(sorted_dict)
+                tv_watchlist_page.show()
+        if year_descend_cb.cget("background") == '#0c2b59':
+            if identifer == 0:
+                mergesort_dict = MergeSortDict(movie_watchlist_dict)
+                sorted_dict = mergesort_dict.merge_sort(by_key=False, ascending=True, value_index=3)
+                update_movie_watchlist(sorted_dict)
+                movie_watchlist_page.show()
+            elif identifer == 1:
+                mergesort_dict = MergeSortDict(tv_watchlist_dict)
+                sorted_dict = mergesort_dict.merge_sort(by_key=False, ascending=True, value_index=3)
+                update_tv_watchlist(sorted_dict)
+                tv_watchlist_page.show()
+        if rating_descend_cb.cget("background") == '#0c2b59':
+            if identifer == 0:
+                mergesort_dict = MergeSortDict(movie_watchlist_dict)
+                sorted_dict = mergesort_dict.merge_sort(by_key=False, ascending=True, value_index=5)
+                update_movie_watchlist(sorted_dict)
+                movie_watchlist_page.show()
+            elif identifer == 1:
+                mergesort_dict = MergeSortDict(tv_watchlist_dict)
+                sorted_dict = mergesort_dict.merge_sort(by_key=False, ascending=True, value_index=5)
+                update_tv_watchlist(sorted_dict)
+                tv_watchlist_page.show()
+        if votes_descend_cb.cget("background") == '#0c2b59':
+            if identifer == 0:
+                mergesort_dict = MergeSortDict(movie_watchlist_dict)
+                sorted_dict = mergesort_dict.merge_sort(by_key=False, ascending=True, value_index=6)
+                update_movie_watchlist(sorted_dict)
+                movie_watchlist_page.show()
+            elif identifer == 1:
+                mergesort_dict = MergeSortDict(tv_watchlist_dict)
+                sorted_dict = mergesort_dict.merge_sort(by_key=False, ascending=True, value_index=6)
+                update_tv_watchlist(sorted_dict)
+                tv_watchlist_page.show()
+
 
 movie_search_page.show()
 start_window.mainloop()
